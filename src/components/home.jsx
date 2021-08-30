@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Redirect } from 'react-router-dom';
+import {auth} from "../config/firebase"
+import { authContext } from '../context/AuthProvider';
+
 
 
 const Home = () => {
-    return ( <h1>Home</h1> );
+    let user=useContext(authContext)
+    return ( <>
+
+    {(user)?"":<Redirect to="login"/>}
+     <button onClick={()=>{
+        auth.signOut();
+    }}>Logout</button>
+    
+    <h1>Home</h1></> );
 }
  
 export default Home;

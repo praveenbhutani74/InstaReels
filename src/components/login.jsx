@@ -1,19 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { Redirect } from 'react-router-dom';
 import { signInWithGoogle, auth } from '../config/firebase'
+import { authContext } from '../context/AuthProvider';
 
 
 
 
 const Login = () => {
-    useEffect(() => {
+    let user=useContext(authContext);
+    console.log(user);
+    
 
-        auth.onAuthStateChanged((user)=>{
-            console.log(user);
-        })
-
-    })
     return (
     <>
+    {user?<Redirect to="/"/>:""}
     <button onClick={() => 
         { signInWithGoogle(); }} 
         className="btn btn-primary">

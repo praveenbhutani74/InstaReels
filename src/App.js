@@ -2,11 +2,13 @@ import React from 'react';
 import {BrowserRouter as Router,Switch,Route } from 'react-router-dom'
 import Home from './components/home';
 import Login from './components/login';
+import AuthProvider  from './context/AuthProvider';
 
 
 function App() {
   return (
    <>
+   <AuthProvider>
     <Router>
       <Switch>
       <Route exact path="/login">
@@ -18,6 +20,7 @@ function App() {
       </Switch>
 
     </Router>
+    </AuthProvider>
    </>
   );
 }
