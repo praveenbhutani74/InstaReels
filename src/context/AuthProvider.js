@@ -1,21 +1,38 @@
 import { createContext,useEffect,useState } from "react";
 import {auth} from "../config/firebase";
+import { firestore } from "../config/firebase";
 
 export const authContext=createContext();
 
 
 let AuthProvider=(props)=>{
+    console.log(props.children);
 
     let [user,setuser]=useState(null);
     let[loading,setloading]=useState(true);
 
 
     useEffect(()=>{
-        let unsub=auth.onAuthStateChanged((user)=>{
+        let unsub=auth.onAuthStateChanged(async(user)=>{
 
             if(user){
-                let {displayName,email,uid,photoUrl } =user;
-                setuser({displayName,email,uid,photoUrl });
+                console.log(user);
+                let {displayName,email,uid,photoURL } =user;
+                setuser({displayName,email,uid,photoURL});
+
+                let docRef=firestore.collection("users").doc(uid);
+
+                let docSnap=await docRef.get();
+                if(!docSnap.exists){
+                    docRef.set({
+                        displayName,
+                        email,
+                        photoURL
+                      })
+                }
+
+
+
 
 
             }

@@ -20,9 +20,7 @@ const Login = () => {
             Login with Google
             </button>
     
-    <button onClick={()=>{
-        auth.signOut();
-    }}>Logout</button>
+   
     </>
     );
 }
