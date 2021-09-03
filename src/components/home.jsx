@@ -11,7 +11,7 @@ const Home = () => {
     let [posts,setPosts]=useState([]);
 
     useEffect(()=>{
-        firestore.collection("posts").onSnapshot((querySnapshot)=>{
+        let unsub= firestore.collection("posts").onSnapshot((querySnapshot)=>{
             let docArr=querySnapshot.docs;
 
             let arr=[];
@@ -23,6 +23,10 @@ const Home = () => {
             }
             setPosts(arr);
         })
+
+        return()=>{
+            unsub();
+        }
 
     })
 
@@ -71,7 +75,7 @@ const Home = () => {
             console.log(error);
         }
         function f3(){
-            uploadTask.snapshot.ref.getDownloadURL().then((url)=>{
+           uploadTask.snapshot.ref.getDownloadURL().then((url)=>{
                 console.log(url);
 
                 firestore.collection("posts").add({
