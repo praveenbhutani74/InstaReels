@@ -1,20 +1,40 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import {auth, storage} from "../config/firebase"
+import {auth, firestore, storage} from "../config/firebase"
 import { authContext } from '../context/AuthProvider';
 import "./home.css";
 import VideoCard from './videoCard.jsx';
 
 
 const Home = () => {
-    let user=useContext(authContext)
+    let user=useContext(authContext);
+    let [posts,setPosts]=useState([]);
+
+    useEffect(()=>{
+        firestore.collection("posts").onSnapshot((querySnapshot)=>{
+            let docArr=querySnapshot.docs;
+
+            let arr=[];
+            for(let i=0;i<docArr.length;i++){
+                arr.push({
+                    id:docArr[i].id,
+                    ...docArr[i].data(),
+                });
+            }
+            setPosts(arr);
+        })
+
+    })
+
+
     return ( <>
 
     {(user)?"":<Redirect to="login"/>}
 
     <div className="video-container">
-        <VideoCard/>
-        <VideoCard/>
+        {posts.map((element)=>{
+            return <VideoCard key={element.id} data={element}/>
+        })}
     </div>
      <button className="home-logout-btn" onClick={()=>{
         auth.signOut();
@@ -28,7 +48,7 @@ const Home = () => {
 
         onChange={(e)=>{
         let videoObj=e.currentTarget.files[0];
-        let {name,size,type}=videoObj;
+        let {displayName,size,type}=videoObj;
 
         size=size/1000000;
         if(size>10){
@@ -40,7 +60,7 @@ const Home = () => {
             alert("plase upload a video file");
             return;
         }
-        let uploadTask=storage.ref(`/posts/${user.uid}/${Date.now()+"-"+name}`).put(videoObj);
+        let uploadTask=storage.ref(`/posts/${user.uid}/${Date.now()+"-"+displayName}`).put(videoObj);
 
         uploadTask.on("state_changed",f1,f2,f3);
 
@@ -53,6 +73,13 @@ const Home = () => {
         function f3(){
             uploadTask.snapshot.ref.getDownloadURL().then((url)=>{
                 console.log(url);
+
+                firestore.collection("posts").add({
+                    name:user.displayName,
+                    url,
+                    likes:[],
+                    comment:[],
+                })  
             });
         }
 
